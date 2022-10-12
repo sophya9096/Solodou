@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "806245809322",
+    "firebase_url": "https://solodou-61c29.firebaseio.com",
+    "project_id": "solodou-61c29",
+    "storage_bucket": "solodou-61c29.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:806245809322:android:d37fb9d6046e3f6c2c24d3",
+        "android_client_info": {
+          "package_name": "com.solodou.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "806245809322-a3j6jh1v87de5ufj817a4hg01leju2h4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwVmVVgBD-K9QrvqiJD0ZA_M5I31sCnrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "806245809322-a3j6jh1v87de5ufj817a4hg01leju2h4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

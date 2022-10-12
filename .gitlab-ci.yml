@@ -1,0 +1,83 @@
+stages:
+  - prepare
+  - build
+
+default:
+  tags: ['smp-runner-mobile']
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build_ios:
+  stage: build
+  allow_failure: false
+  before_script:
+    - export LANG=en_US.UTF-8
+    - eval $(/opt/homebrew/bin/brew shellenv)
+    - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
+    - export PACKAGE_VER=$(node -p -e "require('./package.json').version")
+  script:
+    - whoami
+    - echo $PATH
+    - arch -x86_64 /bin/bash -c ". ~/.nvm/nvm.sh ; npx yarn"
+    - mkdir -p .builds/apk/
+    - cd ios
+    - arch -x86_64 pod install
+    - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
+    - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
+    - mv $PACKAGE_NAME.ipa ../.builds/ipa/$PACKAGE_NAME-v$PACKAGE_VER.ipa
+  artifacts:
+    name: 'ios'
+    paths:
+      - .builds/ipa
+    expire_in: 1 week
+  only:
+    - master
+
+#prepare_android:
+#  stage: prepare
+#  allow_failure: false
+#  image: node:10.17.0
+#  script:
+#    #- cp src/config.js.dist src/config.js
+#    #- cd stats && npx yarn
+#    - npx yarn
+#    #- npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output builds/app.bundle
+#  tags:
+#    - smp-runner-docker
+#  only:
+#    - master
+
+build_android:
+  stage: build
+  allow_failure: false
+  before_script:
+    #- env /usr/bin/arch -x86_64 /bin/zsh --login
+    #- . ~/.nvm/nvm.sh
+    - export LANG=en_US.UTF-8
+    - export ANDROID_HOME=$HOME/Library/Android/sdk
+    - export PATH=$PATH:$ANDROID_HOME/emulator
+    - export PATH=$PATH:$ANDROID_HOME/tools
+    - export PATH=$PATH:$ANDROID_HOME/tools/bin
+    - export PATH=$PATH:$ANDROID_HOME/platform-tools
+    - export APP_BUILD_DATE=$(date '+%Y%m%d%H%M')
+    - eval $(/opt/homebrew/bin/brew shellenv)
+    - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
+    - export PACKAGE_VER=$(node -p -e "require('./package.json').version")
+  script:
+    - whoami
+    - echo $PATH
+    #- cp src/config.js.dist src/config.js
+    - mkdir -p .builds/apk/
+    - arch -x86_64 /bin/bash -c ". ~/.nvm/nvm.sh ; npx yarn"
+    #- arch -x86_64 /bin/bash -c ". ~/.nvm/nvm.sh ; nvm use ; echo 'installing app packages';npx yarn ;echo 'creating bundle'; npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output builds/app.bundle"
+    - cd android
+    - ./gradlew assembleRelease
+    - mv app/build/outputs/apk/release/app-release.apk ../.builds/apk/$APP_BUILD_DATE-$PACKAGE_NAME-v$PACKAGE_VER-release.apk
+  artifacts:
+    name: 'android'
+    paths:
+      - .builds/apk
+    expire_in: 1 week
+  only:
+    - master
